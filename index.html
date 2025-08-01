@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO & LLM 優化 Meta 說明 -->
     <title>想當年...懷舊話匣子 | 專為台灣失智症長輩設計的免費CST互動工具</title>
     <meta name="description" content="正在尋找適合台灣失智症長輩的活動嗎？「想當年...懷舊話匣子」是一款免費的CST認知刺激治療互動工具，精選1950-60年代懷舊主題，透過趣味問答活化大腦、開啟話匣子。專為長照與家庭照護設計，立即免費使用！">
     
@@ -12,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://js.puter.com/v2/"></script>
+
     <style>
         /* --- 全局樣式 --- */
         :root {
@@ -39,6 +41,10 @@
             --explanation-color: #577590;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: var(--background-color);
@@ -47,7 +53,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             padding: 15px;
             box-sizing: border-box;
         }
@@ -62,6 +67,7 @@
             display: flex;
             flex-direction: column;
             position: relative; /* For GitHub link positioning */
+            max-height: 95vh;
         }
 
         .hidden {
@@ -83,6 +89,12 @@
         }
 
         /* --- 主選單樣式 --- */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
         #main-menu header {
             padding: 30px 20px;
             text-align: center;
@@ -166,12 +178,19 @@
 
 
         /* --- 活動畫面樣式 --- */
+        #activity-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
         #activity-header {
             display: flex;
             align-items: center;
             padding: 15px 20px;
             background-color: #fff;
             border-bottom: 1px solid #eee;
+            flex-shrink: 0;
         }
 
         #back-to-menu-btn {
@@ -201,7 +220,7 @@
 
         #content-display {
             padding: 40px;
-            min-height: 450px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -210,13 +229,45 @@
             font-size: 3.5rem;
             line-height: 1.6;
             background-color: #fdfdfd;
+            overflow-y: auto;
+        }
+
+        .question-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .question-text {
             font-weight: 700;
-            margin-bottom: 25px;
         }
 
+        .tts-button {
+            background: none;
+            border: none;
+            font-size: 2.5rem;
+            color: var(--purple-icon);
+            cursor: pointer;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .tts-button:hover {
+            transform: scale(1.2);
+        }
+
+        .tts-button.speaking {
+            color: #ff4081; /* Speaking color */
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
         .answer-text {
             color: var(--correct-color);
             font-weight: bold;
@@ -276,20 +327,79 @@
         .choice-btn.incorrect { background-color: var(--incorrect-color) !important; }
         .choice-btn:disabled { cursor: not-allowed; opacity: 0.8; }
 
-        .reveal-btn {
+        .reveal-btn, .gemini-btn {
             padding: 20px 40px;
             font-size: 1.8rem;
-            background-color: #ffb300;
             color: white;
             border: none;
             border-radius: 10px;
             cursor: pointer;
             margin-top: 25px;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, opacity 0.2s;
         }
         
-        .reveal-btn:hover {
-            background-color: #ffa000;
+        .reveal-btn { background-color: #ffb300; }
+        .reveal-btn:hover { background-color: #ffa000; }
+
+        .gemini-btn {
+            background: linear-gradient(45deg, #4285F4, #9b72cb, #d96570, #f2a60c);
+        }
+        .gemini-btn:hover {
+            opacity: 0.9;
+        }
+        
+        /* Modal for Gemini Story */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 15px;
+            text-align: left;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content h3 {
+            font-size: 2rem;
+            color: var(--purple-icon);
+            margin-top: 0;
+        }
+        
+        #story-text-container {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        #story-text-container p {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .close-button {
+            color: #aaa;
+            align-self: flex-end;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         audio {
@@ -304,6 +414,7 @@
             align-items: center;
             padding: 20px;
             background-color: #f1f1f1;
+            flex-shrink: 0;
         }
 
         #controls button {
@@ -340,300 +451,442 @@
         <a href="https://github.com/thc1006/taiwan-dementia-friendly-cst-activity" target="_blank" class="github-link" aria-label="View source on GitHub">
             <i class="fab fa-github"></i>
         </a>
-        <!-- 主選單畫面 -->
         <div id="main-menu">
             <header>
                 <h1>想當年...懷舊話匣子</h1>
             </header>
             <div id="category-buttons">
-                <!-- 分類按鈕將由 JavaScript 動態生成 -->
-            </div>
+                </div>
         </div>
 
-        <!-- 活動進行畫面 -->
         <div id="activity-container" class="hidden">
             <header id="activity-header">
                 <button id="back-to-menu-btn"><i class="fas fa-arrow-left"></i></button>
                 <h2 id="activity-title"></h2>
             </header>
             <div id="content-display">
-                <!-- 題目內容將由 JavaScript 動態生成 -->
-            </div>
+                </div>
             <div id="controls">
                 <button id="prev-btn"><i class="fas fa-chevron-left"></i> 上一題</button>
                 <span id="item-counter"></span>
                 <button id="next-btn">下一題 <i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
+        
+        <div id="story-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h3>✨ AI 來講古</h3>
+                <div id="story-text-container">
+                    <p id="story-text">請稍候，AI 老師正在回想古早的故事...</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
 
-            // --- 資料庫 (整合修正後的開源圖片) ---
-            const activities = {
-                proverbs: {
-                    title: '台灣俗語',
-                    subtitle: '古早人留落來的智慧！',
-                    icon: 'fa-comments',
-                    theme: 'proverbs',
-                    items: [
-                        { type: 'fill-in', question: '一兼二顧，', answer: '摸蜊仔兼洗褲', explanation: '（做一件事情，得到兩種好處）' },
-                        { type: 'fill-in', question: '聽某喙，', answer: '大富貴', explanation: '（聽太太的話，通常都有好結果）' },
-                        { type: 'fill-in', question: '吃果子，', answer: '拜樹頭', explanation: '（提醒我們做人不能忘本）' },
-                        { type: 'fill-in', question: '細漢偷挽匏，', answer: '大漢偷牽牛', explanation: '（比喻小時候的壞習慣，長大就不得了）' },
-                        { type: 'fill-in', question: '甘願做牛，', answer: '毋驚無犁通拖', explanation: '（鼓勵人只要肯打拼，就不怕沒工作）' },
-                        { type: 'multiple-choice', question: '「牛牽到北京還是牛」是形容一個人？', choices: ['很勤勞', '很固執', '很強壯'], answer: '真固執', explanation: '（意思是說，一個人的個性很難改變）' },
-                        { type: 'fill-in', question: '好酒，', answer: '沉甕底', explanation: '（最好的部分，通常都留在最後才出現）' },
-                        { type: 'fill-in', question: '輸人不輸陣，', answer: '輸陣歹看面', explanation: '（意思是說，氣勢不能輸給別人）' },
-                    ]
-                },
-                landmarks: {
-                    title: '四界𨑨迌',
-                    subtitle: '台灣美麗的好所在！',
-                    icon: 'fa-map-signs',
-                    theme: 'landmarks',
-                    items: [
-                        { type: 'image', question: '請問這是台灣哪個知名地標？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Taipei_101_from_Xiangshan_20240729.jpg/800px-Taipei_101_from_Xiangshan_20240729.jpg', answer: '台北 101' },
-                        { type: 'multiple-choice', question: '哪一個景點以「女王頭」聞名？', choices: ['墾丁', '野柳', '太魯閣'], answer: '野柳' },
-                        { type: 'fill-in', question: '到嘉義一定要上山看日出的地方是？', answer: '阿里山' },
-                        { type: 'image', question: '請問這個有名的石頭在台灣哪裡？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E5%B0%8F%E7%90%89%E7%90%83%E8%8A%B1%E7%93%B6%E5%B2%A9.jpg', answer: '小琉球（花瓶石）' },
-                        { type: 'image', question: '這是有名的古蹟，請問它的名字是？', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/%E5%AE%89%E5%B9%B3%E5%8F%A4%E5%A0%A1%E4%B9%8B%E7%BE%8E.jpg', answer: '安平古堡', attribution: 'By 王崎 - Own work, CC BY-SA 3.0' },
-                        { type: 'image', question: '在台灣最南端的燈塔，叫什麼名字？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Eluanbi_Lighthouse_02.jpg/1280px-Eluanbi_Lighthouse_02.jpg', answer: '鵝鑾鼻燈塔', attribution: '由 Bernard Gagnon - 自己的作品, CC BY-SA 3.0' },
-                        { type: 'fill-in', question: '請問從北平搭車到廣州要搭什麼火車線？', answer: '平漢線' },
-                    ]
-                },
-                brands: {
-                    title: '懷舊的牌子',
-                    subtitle: '彼當時上出名的物件佮名人！',
-                    icon: 'fa-tags',
-                    theme: 'brands',
-                    items: [
-                        { type: 'image', question: '請問這把雨傘是幾百萬？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/refs/heads/main/images/500%E8%90%AC%E9%81%AE%E9%99%BD%E5%82%98.jpg', answer: '500萬' },
-                        { type: 'image', question: '看到這個娃娃，會想到哪個電器？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/03.29_%E7%B8%BD%E7%B5%B1%E5%87%BA%E5%B8%AD%E3%80%8C%E7%AC%AC34%E5%B1%86%E5%8F%B0%E5%8C%97%E9%9B%BB%E5%99%A8%E7%A9%BA%E8%AA%BF%E5%BD%B1%E9%9F%B33C%E5%A4%A7%E5%B1%95%E6%9A%A8%E9%9F%B3%E9%9F%BF%E5%8D%9A%E8%A6%BD%E6%9C%83%E9%96%8B%E5%B9%95%E5%85%B8%E7%A6%AE%E3%80%8D_-_53618324505.jpg/1024px-thumbnail.jpg', answer: '大同電鍋' },
-                        { type: 'fill-in', question: '感冒用斯斯，咳嗽用斯斯，', answer: '鼻塞鼻炎用斯斯' },
-                        { type: 'multiple-choice', question: '「黑人牙膏」現在改名叫什麼？', choices: ['白人牙膏', '好來牙膏', '高露潔'], answer: '好來牙膏' },
-                        { type: 'fill-in', question: '電腦也會...？', answer: '撿土豆' },
-                        { type: 'image', question: '這位帽子歌后是誰？', image: 'https://upload.wikimedia.org/wikipedia/zh-yue/c/c3/%E9%B3%B3%E9%A3%9B%E9%A3%9B.jpg', answer: '鳳飛飛' },
-                        { type: 'fill-in', question: '有「音樂魔術師」之稱，唱紅《我的未來不是夢》的歌手是誰？', answer: '張雨生' },
-                    ]
-                },
-                life: {
-                    title: '生活百寶箱',
-                    subtitle: '古早時的生活物件佮代誌！',
-                    icon: 'fa-box-archive',
-                    theme: 'life',
-                    items: [
-                        { type: 'image', question: '以前阿嬤梳妝台上的這罐「明星」是什麼？', image: 'https://live.staticflickr.com/2746/4170521161_a68b739f92_b.jpg', answer: '明星花露水' },
-                        { type: 'multiple-choice', question: '聽到「給愛麗絲」或「少女的祈禱」，會想到什麼車來了？', choices: ['救護車', '郵差的車', '垃圾車'], answer: '垃圾車' },
-                        { type: 'image', question: '請問圖片中這個有細細長長的頭的東西，請問是什麼？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E9%87%9D%E8%BB%8A%E6%B2%B9.jpg', answer: '針車油' },
-                        { type: 'fill-in', question: '請問中秋節是農曆幾號？中秋節除了吃月餅，還要吃什麼水果？', answer: '八月十五、柚子' },
-                        { type: 'image', question: '下大雨時穿的這種傳統雨衣叫做？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mino.JPG/800px-Mino.JPG', answer: '簑衣' },
-                        { type: 'fill-in', question: '以前小學學的第一套符號是？', answer: 'ㄅㄆㄇㄈ (注音符號)' },
-                    ]
-                },
-                songs: {
-                    title: '懷舊金曲',
-                    subtitle: '點一首，做伙來開講！',
-                    icon: 'fa-music',
-                    theme: 'songs',
-                    items: [
-                        { type: 'song', title: '橄欖樹', firstLine: '不要問我從哪裡來，我的故鄉在遠方...', audio: 'audio/olivetree.mp3' },
-                        { type: 'song', title: '黃昏的故鄉', firstLine: '叫著我，叫著我，黃昏的故鄉不時咧叫我...', audio: 'audio/hometown.mp3' },
-                        { type: 'song', title: '孤女的願望', firstLine: '請借問路邊的阿伯，叨一個是阮的頭路...', audio: 'audio/orphan.mp3' },
-                        { type: 'song', title: '為著十萬元', firstLine: '為著十萬元，甘願賭生命...', audio: 'audio/100k.mp3' },
-                        { type: 'song', title: '媽媽請你也保重', firstLine: '若想起故鄉目屎就流落來，免掛意請你放心...', audio: 'audio/mom.mp3' },
-                        { type: 'song', title: '永遠不回頭', firstLine: '在天色破曉之前，我想要爬上山顛...', explanation: '（電影《七匹狼》的主題曲）', audio: 'audio/neverturnback.mp3' },
-                    ]
+        // --- 資料庫 (整合修正後的開源圖片) ---
+        const activities = {
+            proverbs: {
+                title: '台灣俗語',
+                subtitle: '古早人留落來的智慧！',
+                icon: 'fa-comments',
+                theme: 'proverbs',
+                items: [
+                    { type: 'fill-in', question: '一兼二顧，', answer: '摸蜊仔兼洗褲', explanation: '（做一件事情，得到兩種好處）' },
+                    { type: 'fill-in', question: '聽某喙，', answer: '大富貴', explanation: '（聽太太的話，通常都有好結果）' },
+                    { type: 'fill-in', question: '食果子，', answer: '拜樹頭', explanation: '（提醒我們做人不能忘本）' },
+                    { type: 'fill-in', question: '細漢偷挽匏，', answer: '大漢偷牽牛', explanation: '（比喻小時候的壞習慣，長大就不得了）' },
+                    { type: 'fill-in', question: '甘願做牛，', answer: '毋驚無犁通拖', explanation: '（鼓勵人只要肯打拼，就不怕沒工作）' },
+                    { type: 'multiple-choice', question: '「牛牽到北京還是牛」是形容一個人？', choices: ['真勤勞', '真固執', '真勇健'], answer: '真固執', explanation: '（意思是說，一個人的個性很難改變）' },
+                    { type: 'fill-in', question: '好酒，', answer: '沉甕底', explanation: '（最好的部分，通常都留在最後才出現）' },
+                    { type: 'fill-in', question: '輸人毋輸陣，', answer: '輸陣歹看面', explanation: '（意思是說，氣勢不能輸給別人）' },
+                ]
+            },
+            landmarks: {
+                title: '四界𨑨迌',
+                subtitle: '台灣美麗的好所在！',
+                icon: 'fa-map-signs',
+                theme: 'landmarks',
+                items: [
+                    { type: 'image', question: '請問這是台灣哪個知名地標？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Taipei_101_from_Xiangshan_20240729.jpg/800px-Taipei_101_from_Xiangshan_20240729.jpg', answer: '台北 101' },
+                    { type: 'multiple-choice', question: '哪一個景點以「女王頭」聞名？', choices: ['墾丁', '野柳', '太魯閣'], answer: '野柳' },
+                    { type: 'fill-in', question: '到嘉義一定要上山看日出的地方是？', answer: '阿里山' },
+                    { type: 'image', question: '請問這個有名的石頭在台灣哪裡？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E5%B0%8F%E7%90%89%E7%90%83%E8%8A%B1%E7%93%B6%E5%B2%A9.jpg', answer: '小琉球（花瓶石）' },
+                    { type: 'image', question: '這是有名的古蹟，請問它的名字是？', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/%E5%AE%89%E5%B9%B3%E5%8F%A4%E5%A0%A1%E4%B9%8B%E7%BE%8E.jpg', answer: '安平古堡', attribution: 'By 王崎 - Own work, CC BY-SA 3.0' },
+                    { type: 'image', question: '在台灣最南端的燈塔，叫什麼名字？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Eluanbi_Lighthouse_02.jpg/1280px-Eluanbi_Lighthouse_02.jpg', answer: '鵝鑾鼻燈塔', attribution: '由 Bernard Gagnon - 自己的作品, CC BY-SA 3.0' },
+                ]
+            },
+            brands: {
+                title: '懷舊的牌子',
+                subtitle: '彼當時上出名的物件佮名人！',
+                icon: 'fa-tags',
+                theme: 'brands',
+                items: [
+                    { type: 'image', question: '請問這把雨傘是幾百萬？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E7%87%9F%E6%A5%AD%E7%94%A8%E5%85%A9%E5%82%98.jpg', answer: '500萬' },
+                    { type: 'image', question: '看到這個娃娃，會想到哪個電器？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/03.29_%E7%B8%BD%E7%B5%B1%E5%87%BA%E5%B8%AD%E3%80%8C%E7%AC%AC34%E5%B1%86%E5%8F%B0%E5%8C%97%E9%9B%BB%E5%99%A8%E7%A9%BA%E8%AA%BF%E5%BD%B1%E9%9F%B33C%E5%A4%A7%E5%B1%95%E6%9A%A8%E9%9F%B3%E9%9F%BF%E5%8D%9A%E8%A6%BD%E6%9C%83%E9%96%8B%E5%B9%95%E5%85%B8%E7%A6%AE%E3%80%8D_-_53618324505.jpg/1024px-thumbnail.jpg', answer: '大同電鍋' },
+                    { type: 'fill-in', question: '感冒用斯斯，咳嗽用斯斯，', answer: '鼻塞鼻炎用斯斯' },
+                    { type: 'multiple-choice', question: '「黑人牙膏」現在改名叫什麼？', choices: ['白人牙膏', '好來牙膏', '高露潔'], answer: '好來牙膏' },
+                    { type: 'fill-in', question: '電腦也會...？', answer: '揀土豆' },
+                    { type: 'image', question: '這位帽子歌后是誰？', image: 'https://upload.wikimedia.org/wikipedia/zh-yue/c/c3/%E9%B3%B3%E9%A3%9B%E9%A3%9B.jpg', answer: '鳳飛飛' },
+                ]
+            },
+            life: {
+                title: '生活百寶箱',
+                subtitle: '古早時的生活物件佮代誌！',
+                icon: 'fa-box-archive',
+                theme: 'life',
+                items: [
+                    { type: 'image', question: '以前阿嬤梳妝台上的這罐「明星」是什麼？', image: 'https://live.staticflickr.com/2746/4170521161_a68b739f92_b.jpg', answer: '明星花露水' },
+                    { type: 'multiple-choice', question: '聽到「給愛麗絲」或「少女的祈禱」，會想到什麼車來了？', choices: ['救護車', '郵差的車', '垃圾車'], answer: '垃圾車' },
+                    { type: 'image', question: '請問圖片中這個有細細長長的頭的東西，請問是什麼？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E9%87%9D%E8%BB%8A%E6%B2%B9.jpg', answer: '針車油' },
+                    { type: 'fill-in', question: '請問中秋節是農曆幾號？中秋節除了吃月餅，還要吃什麼水果？', answer: '八月十五、柚子' },
+                    { type: 'image', question: '下大雨時穿的這種傳統雨衣叫做？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mino.JPG/800px-Mino.JPG', answer: '簑衣' },
+                    { type: 'fill-in', question: '以前小學學的第一套符號是？', answer: 'ㄅㄆㄇㄈ (注音符號)' },
+                ]
+            },
+            songs: {
+                title: '懷舊金曲',
+                subtitle: '點一首，做伙來開講！',
+                icon: 'fa-music',
+                theme: 'songs',
+                items: [
+                    { type: 'song', title: '橄欖樹', firstLine: '不要問我從哪裡來，我的故鄉在遠方...', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/olivetree.mp3' },
+                    { type: 'song', title: '黃昏的故鄉', firstLine: '叫著我，叫著我，黃昏的故鄉不時咧叫我...', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/hometown.mp3' },
+                    { type: 'song', title: '孤女的願望', firstLine: '請借問路邊的阿伯，叨一個是阮的頭路...', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/orphan.mp3' },
+                    { type: 'song', title: '為著十萬元', firstLine: '為著十萬元，甘願賭生命...', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/100k.mp3' },
+                    { type: 'song', title: '媽媽請你也保重', firstLine: '若想起故鄉目屎就流落來，免掛意請你放心...', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/mom.mp3' },
+                    { type: 'song', title: '永遠不回頭', firstLine: '在天色破曉之前，我想要爬上山顛...', explanation: '（電影《七匹狼》的主題曲）', audio: 'https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/raw/main/audio/neverturnback.mp3' },
+                ]
+            }
+        };
+
+        // --- 變數 ---
+        let currentActivityId = '';
+        let currentIndex = 0;
+
+        // --- DOM 元素 ---
+        const mainMenu = document.getElementById('main-menu');
+        const categoryButtonsContainer = document.getElementById('category-buttons');
+        const activityContainer = document.getElementById('activity-container');
+        const activityTitle = document.getElementById('activity-title');
+        const contentDisplay = document.getElementById('content-display');
+        const itemCounter = document.getElementById('item-counter');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const storyModal = document.getElementById('story-modal');
+        const storyText = document.getElementById('story-text');
+        const closeButton = document.querySelector('.close-button');
+
+
+        // --- ✨ 步驟 2: 修改 AI 相關函式 ---
+
+        // ✨ [AI Story] 使用 Puter.js 的流式輸出重寫
+        async function generateStory(topic) {
+            storyText.textContent = '請稍候，AI 老師正在回想古早的故事...';
+            storyModal.style.display = 'flex';
+
+            const prompt = `請用繁體中文，扮演一位熟悉台灣1950-60年代的說書人，寫一個大約100至150字，關於「${topic}」的溫馨懷舊短篇故事或情境描述。`;
+            
+            try {
+                const responseStream = await puter.ai.chat(prompt, {
+                    model: 'google/gemini-2.0-flash-lite-001',
+                    stream: true
+                });
+
+                storyText.textContent = ''; // 清空等待文字
+                for await (const part of responseStream) {
+                    if (part?.text) {
+                        storyText.textContent += part.text;
+                    }
+                }
+            } catch (error) {
+                console.error("Error generating story with Puter.js:", error);
+                storyText.textContent = '哎呀，AI 老師今天請假了，請稍後再試！';
+            }
+        }
+        
+        // ✨ [TTS] 使用瀏覽器內建 Web Speech API 重寫，移除所有舊程式碼
+        function speakText(textToSpeak, buttonElement) {
+            if ('speechSynthesis' in window) {
+                // 如果正在朗讀，則停止
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    return;
+                }
+                
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'zh-TW'; // 設定為台灣口音
+                utterance.rate = 0.9; // 稍微放慢速度
+                
+                // 開始朗讀時的 UI 變化
+                utterance.onstart = () => {
+                    buttonElement.classList.add('speaking');
+                    buttonElement.innerHTML = '<i class="fas fa-stop-circle"></i>';
+                };
+
+                // 朗讀結束或錯誤時的 UI 變化
+                const stopSpeaking = () => {
+                    buttonElement.classList.remove('speaking');
+                    buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
+                };
+                utterance.onend = stopSpeaking;
+                utterance.onerror = stopSpeaking;
+
+                window.speechSynthesis.speak(utterance);
+
+            } else {
+                alert("抱歉，您的瀏覽器不支援語音朗讀功能。");
+            }
+        }
+
+        // --- 初始化 ---
+        function init() {
+            // 動態生成主選單按鈕
+            for (const id in activities) {
+                const activity = activities[id];
+                const btn = document.createElement('button');
+                btn.className = `category-btn ${activity.theme}`;
+                btn.dataset.id = id;
+                btn.innerHTML = `
+                    <div class="icon-container">
+                        <i class="fas ${activity.icon}"></i>
+                    </div>
+                    <div class="text-container">
+                        <h3>${activity.title}</h3>
+                        <p>${activity.subtitle}</p>
+                    </div>
+                `;
+                btn.onclick = () => showActivity(id);
+                categoryButtonsContainer.appendChild(btn);
+            }
+
+            // 綁定事件
+            backToMenuBtn.onclick = showMenu;
+            prevBtn.onclick = prevItem;
+            nextBtn.onclick = nextItem;
+            closeButton.onclick = () => storyModal.style.display = 'none';
+            window.onclick = (event) => {
+                if (event.target == storyModal) {
+                    storyModal.style.display = 'none';
                 }
             };
+        }
 
-            // --- 變數 ---
-            let currentActivityId = '';
-            let currentIndex = 0;
+        // --- 功能函數 (此區塊皆為靜態 UI 邏輯，無需修改) ---
+        function showMenu() {
+            mainMenu.classList.remove('hidden');
+            activityContainer.classList.add('hidden');
+        }
 
-            // --- DOM 元素 ---
-            const mainMenu = document.getElementById('main-menu');
-            const categoryButtonsContainer = document.getElementById('category-buttons');
-            const activityContainer = document.getElementById('activity-container');
-            const activityTitle = document.getElementById('activity-title');
-            const contentDisplay = document.getElementById('content-display');
-            const itemCounter = document.getElementById('item-counter');
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        function showActivity(id) {
+            mainMenu.classList.add('hidden');
+            activityContainer.classList.remove('hidden');
+            currentActivityId = id;
+            currentIndex = 0;
+            activityTitle.textContent = activities[id].title;
+            displayItem();
+        }
 
-            // --- 初始化 ---
-            function init() {
-                // 動態生成主選單按鈕
-                for (const id in activities) {
-                    const activity = activities[id];
-                    const btn = document.createElement('button');
-                    btn.className = `category-btn ${activity.theme}`;
-                    btn.dataset.id = id;
-                    btn.innerHTML = `
-                        <div class="icon-container">
-                            <i class="fas ${activity.icon}"></i>
-                        </div>
-                        <div class="text-container">
-                            <h3>${activity.title}</h3>
-                            <p>${activity.subtitle}</p>
-                        </div>
-                    `;
-                    btn.onclick = () => showActivity(id);
-                    categoryButtonsContainer.appendChild(btn);
-                }
+        function displayItem() {
+            const activity = activities[currentActivityId];
+            const item = activity.items[currentIndex];
+            contentDisplay.innerHTML = ''; // 清空
 
-                // 綁定事件
-                backToMenuBtn.onclick = showMenu;
-                prevBtn.onclick = prevItem;
+            const questionContainer = document.createElement('div');
+            questionContainer.className = 'question-container';
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = item.question || item.title;
+            
+            const ttsButton = document.createElement('button');
+            ttsButton.className = 'tts-button';
+            ttsButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+            ttsButton.onclick = () => speakText(questionText.textContent, ttsButton);
+            
+            questionContainer.appendChild(questionText);
+            questionContainer.appendChild(ttsButton);
+            contentDisplay.appendChild(questionContainer);
+
+            switch (item.type) {
+                case 'fill-in':
+                    renderFillIn(item);
+                    break;
+                case 'multiple-choice':
+                    renderMultipleChoice(item);
+                    break;
+                case 'image':
+                    renderImage(item);
+                    break;
+                case 'song':
+                    renderSong(item);
+                    break;
+            }
+            updateControls();
+        }
+        
+        function addGeminiButton(item) {
+            const geminiBtn = document.createElement('button');
+            geminiBtn.className = 'gemini-btn';
+            geminiBtn.innerHTML = '✨ AI 來講古';
+            geminiBtn.onclick = () => generateStory(item.answer || item.title);
+            return geminiBtn;
+        }
+
+        function renderFillIn(item) {
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer-text hidden';
+            answerDiv.textContent = item.answer;
+            
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation-text hidden';
+            explanationDiv.textContent = item.explanation || '';
+
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'reveal-btn';
+            revealBtn.textContent = '揭曉答案';
+            
+            revealBtn.onclick = (e) => {
+                answerDiv.classList.remove('hidden');
+                if (item.explanation) explanationDiv.classList.remove('hidden');
+                e.target.replaceWith(addGeminiButton(item));
+            };
+
+            contentDisplay.appendChild(answerDiv);
+            contentDisplay.appendChild(explanationDiv);
+            contentDisplay.appendChild(revealBtn);
+        }
+
+        function renderMultipleChoice(item) {
+            const choicesContainer = document.createElement('div');
+            choicesContainer.className = 'choices-container';
+            item.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice;
+                choicesContainer.appendChild(btn);
+            });
+
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer-text hidden';
+            answerDiv.textContent = `正確答案是：${item.answer}`;
+
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation-text hidden';
+            explanationDiv.textContent = item.explanation || '';
+
+            contentDisplay.appendChild(choicesContainer);
+            contentDisplay.appendChild(answerDiv);
+            contentDisplay.appendChild(explanationDiv);
+
+            choicesContainer.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const isCorrect = btn.textContent === item.answer;
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    answerDiv.classList.remove('hidden');
+                    if (item.explanation) explanationDiv.classList.remove('hidden');
+                    
+                    choicesContainer.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+                    choicesContainer.insertAdjacentElement('afterend', addGeminiButton(item));
+                };
+            });
+        }
+
+        function renderImage(item) {
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = '題目圖片';
+            img.className = 'image-prompt';
+            img.onerror = () => { img.src = 'https://placehold.co/400x250/cccccc/ffffff?text=圖片載入失敗'; };
+
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer-text hidden';
+            answerDiv.textContent = item.answer;
+
+            const attributionDiv = document.createElement('div');
+            attributionDiv.className = 'attribution-text hidden';
+            attributionDiv.textContent = item.attribution || '';
+
+            const revealBtn = document.createElement('button');
+            revealBtn.className = 'reveal-btn';
+            revealBtn.textContent = '揭曉答案';
+            
+            revealBtn.onclick = (e) => {
+                answerDiv.classList.remove('hidden');
+                if (item.attribution) attributionDiv.classList.remove('hidden');
+                e.target.replaceWith(addGeminiButton(item));
+            };
+
+            contentDisplay.appendChild(img);
+            contentDisplay.appendChild(answerDiv);
+            contentDisplay.appendChild(attributionDiv);
+            contentDisplay.appendChild(revealBtn);
+        }
+
+        function renderSong(item) {
+            const firstLine = document.createElement('p');
+            firstLine.style.fontSize = '2.5rem';
+            firstLine.style.margin = '10px 0';
+            firstLine.textContent = item.firstLine;
+
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = item.audio;
+
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation-text hidden';
+            explanationDiv.textContent = item.explanation || '';
+            
+            contentDisplay.appendChild(firstLine);
+            contentDisplay.appendChild(audio);
+            contentDisplay.appendChild(explanationDiv);
+            contentDisplay.appendChild(addGeminiButton(item));
+
+             if (item.explanation) {
+                setTimeout(() => {
+                    const explanationEl = contentDisplay.querySelector('.explanation-text');
+                    if(explanationEl) explanationEl.classList.remove('hidden');
+                }, 500);
+             }
+        }
+
+        function updateControls() {
+            const activity = activities[currentActivityId];
+            itemCounter.textContent = `${currentIndex + 1} / ${activity.items.length}`;
+            prevBtn.disabled = currentIndex === 0;
+
+            if (currentIndex === activity.items.length - 1) {
+                nextBtn.innerHTML = '回主選單 <i class="fas fa-home"></i>';
+                nextBtn.onclick = showMenu;
+            } else {
+                nextBtn.innerHTML = '下一題 <i class="fas fa-chevron-right"></i>';
                 nextBtn.onclick = nextItem;
             }
+        }
 
-            // --- 功能函數 ---
-            function showMenu() {
-                mainMenu.classList.remove('hidden');
-                activityContainer.classList.add('hidden');
-            }
-
-            function showActivity(id) {
-                mainMenu.classList.add('hidden');
-                activityContainer.classList.remove('hidden');
-                currentActivityId = id;
-                currentIndex = 0;
-                activityTitle.textContent = activities[id].title;
+        function prevItem() {
+            if (currentIndex > 0) {
+                currentIndex--;
                 displayItem();
             }
+        }
 
-            function displayItem() {
-                const activity = activities[currentActivityId];
-                const item = activity.items[currentIndex];
-                contentDisplay.innerHTML = ''; // 清空
-
-                switch (item.type) {
-                    case 'fill-in':
-                        renderFillIn(item);
-                        break;
-                    case 'multiple-choice':
-                        renderMultipleChoice(item);
-                        break;
-                    case 'image':
-                        renderImage(item);
-                        break;
-                    case 'song':
-                        renderSong(item);
-                        break;
-                }
-                updateControls();
+        function nextItem() {
+            const activity = activities[currentActivityId];
+            if (currentIndex < activity.items.length - 1) {
+                currentIndex++;
+                displayItem();
             }
-            
-            function renderFillIn(item) {
-                contentDisplay.innerHTML = `
-                    <div class="question-text">${item.question}</div>
-                    <div class="answer-text hidden">${item.answer}</div>
-                    <div class="explanation-text hidden">${item.explanation || ''}</div>
-                    <button class="reveal-btn">揭曉答案</button>
-                `;
-                contentDisplay.querySelector('.reveal-btn').onclick = (e) => {
-                    contentDisplay.querySelector('.answer-text').classList.remove('hidden');
-                    if (item.explanation) {
-                        contentDisplay.querySelector('.explanation-text').classList.remove('hidden');
-                    }
-                    e.target.classList.add('hidden');
-                };
-            }
+        }
 
-            function renderMultipleChoice(item) {
-                const choicesHtml = item.choices.map(choice => 
-                    `<button class="choice-btn">${choice}</button>`
-                ).join('');
-
-                contentDisplay.innerHTML = `
-                    <div class="question-text">${item.question}</div>
-                    <div class="choices-container">${choicesHtml}</div>
-                    <div class="answer-text hidden">正確答案是：${item.answer}</div>
-                    <div class="explanation-text hidden">${item.explanation || ''}</div>
-                `;
-
-                contentDisplay.querySelectorAll('.choice-btn').forEach(btn => {
-                    btn.onclick = () => {
-                        const isCorrect = btn.textContent === item.answer;
-                        btn.classList.add(isCorrect ? 'correct' : 'incorrect');
-                        contentDisplay.querySelector('.answer-text').classList.remove('hidden');
-                        if (item.explanation) {
-                            contentDisplay.querySelector('.explanation-text').classList.remove('hidden');
-                        }
-                        // 禁用所有按鈕
-                        contentDisplay.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
-                    };
-                });
-            }
-
-            function renderImage(item) {
-                contentDisplay.innerHTML = `
-                    <div class="question-text">${item.question}</div>
-                    <img src="${item.image}" alt="題目圖片" class="image-prompt" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/ffffff?text=圖片載入失敗';">
-                    <div class="answer-text hidden">${item.answer}</div>
-                    <div class="attribution-text hidden">${item.attribution || ''}</div>
-                    <button class="reveal-btn">揭曉答案</button>
-                `;
-                contentDisplay.querySelector('.reveal-btn').onclick = (e) => {
-                    contentDisplay.querySelector('.answer-text').classList.remove('hidden');
-                    if (item.attribution) {
-                        contentDisplay.querySelector('.attribution-text').classList.remove('hidden');
-                    }
-                    e.target.classList.add('hidden');
-                };
-            }
-
-            function renderSong(item) {
-                contentDisplay.innerHTML = `
-                    <div class="question-text">${item.title}</div>
-                    <p style="font-size: 2rem; margin: 10px 0;">${item.firstLine}</p>
-                    <audio controls src="${item.audio}"></audio>
-                    <div class="explanation-text hidden">${item.explanation || ''}</div>
-                `;
-                 // For songs, reveal explanation immediately after audio
-                 if (item.explanation) {
-                    setTimeout(() => {
-                        const explanationEl = contentDisplay.querySelector('.explanation-text');
-                        if(explanationEl) explanationEl.classList.remove('hidden');
-                    }, 500);
-                }
-            }
-
-            function updateControls() {
-                const activity = activities[currentActivityId];
-                itemCounter.textContent = `${currentIndex + 1} / ${activity.items.length}`;
-                prevBtn.disabled = currentIndex === 0;
-
-                if (currentIndex === activity.items.length - 1) {
-                    nextBtn.innerHTML = '回主選單 <i class="fas fa-home"></i>';
-                    nextBtn.onclick = showMenu;
-                } else {
-                    nextBtn.innerHTML = '下一題 <i class="fas fa-chevron-right"></i>';
-                    nextBtn.onclick = nextItem;
-                }
-            }
-
-            function prevItem() {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    displayItem();
-                }
-            }
-
-            function nextItem() {
-                const activity = activities[currentActivityId];
-                if (currentIndex < activity.items.length - 1) {
-                    currentIndex++;
-                    displayItem();
-                }
-            }
-
-            // 啟動應用
-            init();
-        });
+        // 啟動應用
+        init();
+    });
     </script>
 </body>
 </html>
