@@ -66,7 +66,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            position: relative; /* For GitHub link positioning */
+            position: relative;
             max-height: 95vh;
         }
 
@@ -256,20 +256,16 @@
         .tts-button:hover:not(:disabled) {
             transform: scale(1.2);
         }
-        .tts-button:disabled {
-            cursor: not-allowed;
-            color: #ccc;
-        }
-        
-        .tts-button .fa-spinner {
+
+        .tts-button:disabled .fa-spinner {
             animation: spin 1s linear infinite;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
+        
         .answer-text {
             color: var(--correct-color);
             font-weight: bold;
@@ -618,11 +614,11 @@
             buttonElement.disabled = true;
 
             try {
-                // 使用 Puter.js 的 txt2speech 功能，並指定台灣中文
+                // 使用 Puter.js 進行文字轉語音，並指定台灣中文
                 const audio = await puter.ai.txt2speech(textToSpeak, 'zh-TW');
                 audio.play();
-
-                // 監聽音訊結束事件以恢復按鈕狀態
+                
+                // 監聽音訊播放結束事件，以便恢復按鈕狀態
                 audio.addEventListener('ended', () => {
                     buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
                     buttonElement.disabled = false;
@@ -695,7 +691,6 @@
             
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
-            // For songs, the primary text is the title
             questionText.textContent = item.question || item.title;
             
             const ttsButton = document.createElement('button');
