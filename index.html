@@ -250,24 +250,26 @@
             font-size: 2.5rem;
             color: var(--purple-icon);
             cursor: pointer;
-            transition: transform 0.2s, color 0.2s;
+            transition: transform 0.2s;
         }
 
-        .tts-button:hover {
+        .tts-button:hover:not(:disabled) {
             transform: scale(1.2);
         }
-
-        .tts-button.speaking {
-            color: #ff4081; /* Speaking color */
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        .tts-button:disabled {
+            cursor: not-allowed;
+            color: #ccc;
         }
         
+        .tts-button .fa-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .answer-text {
             color: var(--correct-color);
             font-weight: bold;
@@ -610,39 +612,30 @@
             }
         }
         
-        // ✨ [TTS] 使用瀏覽器內建 Web Speech API 重寫，移除所有舊程式碼
-        function speakText(textToSpeak, buttonElement) {
-            if ('speechSynthesis' in window) {
-                // 如果正在朗讀，則停止
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                    return;
-                }
-                
-                const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                utterance.lang = 'zh-TW'; // 設定為台灣口音
-                utterance.rate = 0.9; // 稍微放慢速度
-                
-                // 開始朗讀時的 UI 變化
-                utterance.onstart = () => {
-                    buttonElement.classList.add('speaking');
-                    buttonElement.innerHTML = '<i class="fas fa-stop-circle"></i>';
-                };
+        // ✨ [TTS] 使用 Puter.js 的 txt2speech 功能重寫
+        async function speakText(textToSpeak, buttonElement) {
+            buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            buttonElement.disabled = true;
 
-                // 朗讀結束或錯誤時的 UI 變化
-                const stopSpeaking = () => {
-                    buttonElement.classList.remove('speaking');
+            try {
+                // 使用 Puter.js 的 txt2speech 功能，並指定台灣中文
+                const audio = await puter.ai.txt2speech(textToSpeak, 'zh-TW');
+                audio.play();
+
+                // 監聽音訊結束事件以恢復按鈕狀態
+                audio.addEventListener('ended', () => {
                     buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
-                };
-                utterance.onend = stopSpeaking;
-                utterance.onerror = stopSpeaking;
+                    buttonElement.disabled = false;
+                });
 
-                window.speechSynthesis.speak(utterance);
-
-            } else {
-                alert("抱歉，您的瀏覽器不支援語音朗讀功能。");
+            } catch (error) {
+                console.error("Error with Puter.js TTS:", error);
+                alert("抱歉，朗讀功能暫時無法使用。");
+                buttonElement.innerHTML = '<i class="fas fa-volume-up"></i>';
+                buttonElement.disabled = false;
             }
         }
+
 
         // --- 初始化 ---
         function init() {
@@ -702,6 +695,7 @@
             
             const questionText = document.createElement('div');
             questionText.className = 'question-text';
+            // For songs, the primary text is the title
             questionText.textContent = item.question || item.title;
             
             const ttsButton = document.createElement('button');
