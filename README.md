@@ -1,5 +1,12 @@
 # **想當年...懷舊話匣子 (CST 活動七：台灣在地化互動版)**
 
+[![Website](https://img.shields.io/github/deployments/thc1006/taiwan-dementia-friendly-cst-activity/github-pages?label=Website&style=for-the-badge)](https://thc1006.github.io/taiwan-dementia-friendly-cst-activity/)
+[![GitHub license](https://img.shields.io/github/license/thc1006/taiwan-dementia-friendly-cst-activity?style=for-the-badge)](https://github.com/thc1006/taiwan-dementia-friendly-cst-activity/blob/main/LICENSE)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Made with Love for Dementia Care](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20for%20Dementia%20Care-blueviolet?style=for-the-badge)
+
 ## **專案緣起與目標**
 
 本專案是一個專為台灣失智症長者設計的數位化認知刺激治療 (Cognitive Stimulation Therapy, CST) 活動工具。其核心設計源自於國際實證有效的 CST 手冊《Making a Difference》，並針對其中的**第七節：詞語聯想 (Word Association)** 進行了深度的在地化與數位化改良。
