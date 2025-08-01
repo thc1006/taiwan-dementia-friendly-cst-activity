@@ -210,6 +210,12 @@
             margin-top: 15px;
             font-style: italic;
         }
+        
+        .attribution-text {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 15px;
+        }
 
         .image-prompt {
             max-width: 90%;
@@ -366,13 +372,13 @@
                     icon: 'fa-map-signs',
                     theme: 'landmarks',
                     items: [
-                        { type: 'image', question: '請問這是台灣哪個知名地標？', image: 'images/鵝鑾鼻燈塔.jpg', answer: '台北 101' },
+                        { type: 'image', question: '請問這是台灣哪個知名地標？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Taipei_101_from_Xiangshan_20240729.jpg/800px-Taipei_101_from_Xiangshan_20240729.jpg', answer: '台北 101' },
                         { type: 'multiple-choice', question: '哪一個景點以「女王頭」聞名？', choices: ['墾丁', '野柳', '太魯閣'], answer: '野柳' },
                         { type: 'fill-in', question: '到嘉義一定要上山看日出的地方是？', answer: '阿里山' },
-                        { type: 'image', question: '請問這個海邊岩石風景在台灣（外島）哪裡？', image: 'images/小琉球花瓶岩.jpg', answer: '小琉球（花瓶石）' },
-                        { type: 'image', question: '這是有名的古蹟，請問它的名字是？', image: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Tainan_Taiwan_Fort-Provintia-01.jpg', answer: '台南 赤崁樓' },
-                        { type: 'image', question: '在台灣最南端的燈塔，叫什麼名字？', image: 'images/鵝鑾鼻燈塔.jpg', answer: '鵝鑾鼻燈塔' },
-                        { type: 'fill-in', question: '從北平搭車到廣州，請問要搭什麼火車線？', answer: '平漢線' },
+                        { type: 'image', question: '請問這個有名的石頭在台灣哪裡？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E5%B0%8F%E7%90%89%E7%90%83%E8%8A%B1%E7%93%B6%E5%B2%A9.jpg', answer: '小琉球（花瓶石）' },
+                        { type: 'image', question: '這是有名的古蹟，請問它的名字是？', image: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/%E5%AE%89%E5%B9%B3%E5%8F%A4%E5%A0%A1%E4%B9%8B%E7%BE%8E.jpg', answer: '安平古堡', attribution: 'By 王崎 - Own work, CC BY-SA 3.0' },
+                        { type: 'image', question: '在台灣最南端的燈塔，叫什麼名字？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Eluanbi_Lighthouse_02.jpg/1280px-Eluanbi_Lighthouse_02.jpg', answer: '鵝鑾鼻燈塔', attribution: '由 Bernard Gagnon - 自己的作品, CC BY-SA 3.0' },
+                        { type: 'fill-in', question: '請問從北平搭車到廣州要搭什麼火車線？', answer: '平漢線' },
                     ]
                 },
                 brands: {
@@ -381,7 +387,7 @@
                     icon: 'fa-tags',
                     theme: 'brands',
                     items: [
-                        { type: 'image', question: '請問這把雨傘是幾百萬？', image: 'images/500萬遮陽傘.jpg', answer: '500萬' },
+                        { type: 'image', question: '請問這把雨傘是幾百萬？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E7%87%9F%E6%A5%AD%E7%94%A8%E5%85%A9%E5%82%98.jpg', answer: '500萬' },
                         { type: 'image', question: '看到這個娃娃，會想到哪個電器？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/03.29_%E7%B8%BD%E7%B5%B1%E5%87%BA%E5%B8%AD%E3%80%8C%E7%AC%AC34%E5%B1%86%E5%8F%B0%E5%8C%97%E9%9B%BB%E5%99%A8%E7%A9%BA%E8%AA%BF%E5%BD%B1%E9%9F%B33C%E5%A4%A7%E5%B1%95%E6%9A%A8%E9%9F%B3%E9%9F%BF%E5%8D%9A%E8%A6%BD%E6%9C%83%E9%96%8B%E5%B9%95%E5%85%B8%E7%A6%AE%E3%80%8D_-_53618324505.jpg/1024px-thumbnail.jpg', answer: '大同電鍋' },
                         { type: 'fill-in', question: '感冒用斯斯，咳嗽用斯斯，', answer: '鼻塞鼻炎用斯斯' },
                         { type: 'multiple-choice', question: '「黑人牙膏」現在改名叫什麼？', choices: ['白人牙膏', '好來牙膏', '高露潔'], answer: '好來牙膏' },
@@ -398,10 +404,10 @@
                     items: [
                         { type: 'image', question: '以前阿嬤梳妝台上的這罐「明星」是什麼？', image: 'https://live.staticflickr.com/2746/4170521161_a68b739f92_b.jpg', answer: '明星花露水' },
                         { type: 'multiple-choice', question: '聽到「給愛麗絲」或「少女的祈禱」，會想到什麼車來了？', choices: ['救護車', '郵差的車', '垃圾車'], answer: '垃圾車' },
-                        { type: 'image', question: '請問圖片中這個有細細長長的頭的東西，請問是什麼？', image: 'images/針車油.jpg', answer: '針車油' },
+                        { type: 'image', question: '請問圖片中這個有細細長長的頭的東西，請問是什麼？', image: 'https://raw.githubusercontent.com/thc1006/taiwan-dementia-friendly-cst-activity/main/images/%E9%87%9D%E8%BB%8A%E6%B2%B9.jpg', answer: '針車油' },
                         { type: 'fill-in', question: '請問中秋節是農曆幾號？中秋節除了吃月餅，還要吃什麼水果？', answer: '八月十五、柚子' },
-                        { type: 'image', question: '這種傳統雨衣叫做？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mino.JPG/800px-Mino.JPG', answer: '簑衣' },
-                        { type: 'fill-in', question: '以前小學學的第一套拼音符號是？', answer: 'ㄅㄆㄇㄈ (注音符號)' },
+                        { type: 'image', question: '下大雨時穿的這種傳統雨衣叫做？', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Mino.JPG/800px-Mino.JPG', answer: '簑衣' },
+                        { type: 'fill-in', question: '以前小學學的第一套符號是？', answer: 'ㄅㄆㄇㄈ (注音符號)' },
                     ]
                 },
                 songs: {
@@ -546,10 +552,14 @@
                     <div class="question-text">${item.question}</div>
                     <img src="${item.image}" alt="題目圖片" class="image-prompt" onerror="this.onerror=null;this.src='https://placehold.co/400x250/cccccc/ffffff?text=圖片載入失敗';">
                     <div class="answer-text hidden">${item.answer}</div>
+                    <div class="attribution-text hidden">${item.attribution || ''}</div>
                     <button class="reveal-btn">揭曉答案</button>
                 `;
                 contentDisplay.querySelector('.reveal-btn').onclick = (e) => {
                     contentDisplay.querySelector('.answer-text').classList.remove('hidden');
+                    if (item.attribution) {
+                        contentDisplay.querySelector('.attribution-text').classList.remove('hidden');
+                    }
                     e.target.classList.add('hidden');
                 };
             }
